@@ -17,9 +17,9 @@ const PORT = process.env.PORT || 5000;
 // Connections
 app.use(cors({
   origin: [
-    'http://localhost:3000',           // for local dev
-    'https://iskonnect.vercel.app',     // ✅ your live frontend
-    'https://iskonnect.vercel.app/'     // sometimes trailing slash matters
+    'http://localhost:3000',           
+    'https://iskonnect.vercel.app',     
+    'https://iskonnect.vercel.app/'    
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,                   // if using cookies/sessions
