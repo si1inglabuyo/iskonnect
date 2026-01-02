@@ -26,6 +26,9 @@ app.use(cors({
   credentials: true,                   // if using cookies/sessions
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle preflight requests globally
+app.options('*', cors());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/likes', authenticate, require('./routes/likes'));
