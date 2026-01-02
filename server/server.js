@@ -15,6 +15,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Connections
+
+app.use(express.json());
 app.use(cors({
   origin: [
     'http://localhost:3000',           
@@ -25,7 +27,6 @@ app.use(cors({
   credentials: true,                   // if using cookies/sessions
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/likes', authenticate, require('./routes/likes'));
