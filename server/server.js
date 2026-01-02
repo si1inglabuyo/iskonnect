@@ -17,9 +17,13 @@ const PORT = process.env.PORT || 5000;
 // Connections
 app.use(cors({
   origin: [
-    'http://localhost:3000',        
-    'https://your-frontend.vercel.app' 
-  ]
+    'http://localhost:3000',           // for local dev
+    'https://iskonnect.vercel.app',     // ✅ your live frontend
+    'https://iskonnect.vercel.app/'     // sometimes trailing slash matters
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,                   // if using cookies/sessions
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
