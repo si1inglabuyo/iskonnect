@@ -1,0 +1,120 @@
+erDiagram
+    %% Core Identity
+    users ||--o{ profiles : "1:1"
+    users ||--o{ posts : "1:N"
+    users ||--o{ comments : "1:N"
+
+    %% Content
+    posts ||--o{ media : "1:N"
+    posts ||--o{ comments : "1:N"
+
+    %% Social Actions
+    users ||--o{ likes : "1:N"
+    posts ||--o{ likes : "1:N"
+    
+    users ||--o{ follows : "1:N (follower)"
+    users }o--|| follows : "N:1 (following)"
+    
+    users ||--o{ saved_posts : "1:N"
+    posts ||--o{ saved_posts : "1:N"
+
+    %% Messaging
+    conversations ||--o{ participants : "1:N"
+    users ||--o{ participants : "1:N"
+    
+    conversations ||--o{ messages : "1:N"
+    users ||--o{ messages : "1:N (sender)"
+
+    %% Notifications
+    users ||--o{ notifications : "1:N (receiver)"
+    users }o--|| notifications : "N:1 (actor)"
+    posts ||--o{ notifications : "1:N"
+    comments ||--o{ notifications : "1:N"
+
+    %% Table Definitions
+    users {
+        int id PK
+        string email
+        text password_hash
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    profiles {
+        int id PK
+        int user_id FK
+        string username
+        string full_name
+        text bio
+        text avatar_url
+        text website
+        timestamptz created_at
+    }
+    posts {
+        int id PK
+        int user_id FK
+        text content
+        text image_url
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    media {
+        int id PK
+        int post_id FK
+        text url
+        string media_type
+        timestamptz created_at
+    }
+    likes {
+        int id PK
+        int user_id FK
+        int post_id FK
+        timestamptz created_at
+    }
+    comments {
+        int id PK
+        int user_id FK
+        int post_id FK
+        int parent_comment_id FK
+        text content
+        timestamptz created_at
+    }
+    follows {
+        int id PK
+        int follower_id FK "→ users.id"
+        int following_id FK "→ users.id"
+        timestamptz created_at
+    }
+    saved_posts {
+        int id PK
+        int user_id FK
+        int post_id FK
+        timestamptz created_at
+    }
+    conversations {
+        int id PK
+        timestamptz created_at
+    }
+    participants {
+        int id PK
+        int conversation_id FK
+        int user_id FK
+        timestamptz created_at
+    }
+    messages {
+        int id PK
+        int conversation_id FK
+        int sender_id FK
+        text content
+        boolean is_read
+        timestamptz created_at
+    }
+    notifications {
+        int id PK
+        int user_id FK "→ receiver"
+        int actor_id FK "→ users.id"
+        string action_type
+        int post_id FK
+        int comment_id FK
+        boolean is_read
+        timestamptz created_at
+    }
