@@ -18,28 +18,30 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 // Manual CORS middleware
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'https://iskonnect.vercel.app'
-  ];
+// CORS
+// Allow configuring client origins via env var (comma-separated)
+const CLIENT_ORIGINS = (process.env.CLIENT_ORIGINS || 'http://localhost:3000,https://iskonnect.vercel.app')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
 
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+app.use(cors({
+  origin: function(origin, callback) {
+    // Allow non-browser requests (e.g., server-to-server, curl) when origin is undefined
+    if (!origin) return callback(null, true);
+    if (CLIENT_ORIGINS.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: This origin is not allowed'));
+  },
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization'],
+  credentials: true,
+}));
 
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+// Also handle preflight quickly
 
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
 
-  next();
-});
 
 
 app.use('/api/auth', require('./routes/auth'));
