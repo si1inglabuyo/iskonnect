@@ -10,8 +10,6 @@ yarn-error.log*
 # CLIENT
 # ======================
 /client/node_modules
-/client/.pnp
-/client/.pnp.js
 /client/coverage
 /client/build
 /client/.env.local
