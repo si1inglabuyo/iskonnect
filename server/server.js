@@ -17,32 +17,16 @@ const PORT = process.env.PORT || 5000;
 // Connections
 app.use(express.json());
 
-// Manual CORS middleware
-// CORS
-// Allow configuring client origins via env var (comma-separated)
-const CLIENT_ORIGINS = (process.env.CLIENT_ORIGINS || 'http://localhost:3000,https://iskonnect.vercel.app')
-  .split(',')
-  .map(s => s.trim())
-  .filter(Boolean);
-
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow non-browser requests (e.g., server-to-server, curl) when origin is undefined
-    if (!origin) return callback(null, true);
-    if (CLIENT_ORIGINS.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS policy: This origin is not allowed'));
-  },
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization'],
-  credentials: true,
+  origin: [
+    'http://localhost:3000',           // for local dev
+    'https://iskonnect.vercel.app',     // ✅ your live frontend
+    'https://iskonnect.vercel.app/'     // sometimes trailing slash matters
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,                   // if using cookies/sessions
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-// Also handle preflight quickly
-
-
-
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
