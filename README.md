@@ -337,7 +337,8 @@ This project is licensed under the ISC License.
 
 ## 👤 Author
 
-Created with ❤️ 
+Reviman G. Ocasion
+BSIT
 
 ## 🎯 Future Enhancements
 
