@@ -56,9 +56,7 @@ app.use('/api/conversations', authenticate, require('./routes/messages'));
 app.use('/api/search', authenticate, require('./routes/search'));
 app.use('/api/saves', authenticate, require('./routes/saves'));
 app.use('/api/messages', authenticate, require('./routes/messages'));
-
-// Optional: Remove if you don't have a friends route
-// app.use('/api/friends', authenticate, require('./routes/friends'));
+app.use('/api/friends', authenticate, require('./routes/friends'));
 
 // Database connection
 sequelize.authenticate()
