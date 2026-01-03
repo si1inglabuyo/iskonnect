@@ -97,7 +97,7 @@ export default function MobileSidebar({ isOpen, onClose }) {
 
           {/* Current User Info */}
           {currentUser && (
-            <div className="flex items-center gap-3 pt-4 ">
+            <div className="flex items-center gap-3 pt-4">
               <Avatar 
                 username={currentUser.Profile?.username || currentUser.email?.charAt(0).toUpperCase()}
                 size="sm"

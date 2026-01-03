@@ -12,6 +12,19 @@ const imagekit = new ImageKit({
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Authentication endpoint for imagekit-javascript
+router.get('/auth', (req, res) => {
+  try {
+    console.log('/api/upload/auth called from origin:', req.headers.origin || req.headers.referer || 'unknown');
+    const result = imagekit.getAuthenticationParameters();
+    console.log('Auth params generated:', result);
+    res.json(result);
+  } catch (err) {
+    console.error('Auth error:', err);
+    res.status(500).json({ error: 'Failed to generate auth' });
+  }
+});
+
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {

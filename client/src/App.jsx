@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Sidebar from './components/Sidebar';
@@ -36,20 +36,27 @@ function AuthenticatedLayout({ children }) {
     setIsMenuOpen(false);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMenuOpen]);
+
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen ${isMenuOpen ? 'overflow-hidden' : ''}`}>
       {/* Mobile header - positioned outside flex for sticky to work */}
-      <div className="md:hidden sticky top-0">
+      <div className="md:hidden sticky top-0 z-30">
         <MobileHeader isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} onClose={handleCloseMenu} />
       </div>
-      <div className="flex">
+      <div className="flex relative">
         {/* Sidebar - hidden on mobile */}
         <div className="hidden md:block">
           <Sidebar key={currentUser?.id} />
         </div>
 
         {/* Main content area */}
-        <div className="w-full md:ml-64">
+        <div className="w-full md:ml-64 relative z-10">
           {children}
         </div>
       </div>

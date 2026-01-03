@@ -314,7 +314,7 @@ export default function FeedPage() {
                     >
                       {post.User?.Profile?.username || 'Unknown User'}
                     </span>
-                    <div className='text-xs text-gray-500'>
+                    <div className='text-[0.65rem] text-gray-500'>
                       {formatDateTime(post.createdAt || post.created_at)}
                     </div>
                   </div>

@@ -309,10 +309,10 @@ export default function ChatPage() {
                         </div>
                       </div>
                     )}
-                    {isGroup && !isOwn && (
+                    {!isOwn && (
                       <Avatar
-                        username={msg.sender_username}
-                        src={msg.sender_avatar}
+                        username={msg.sender_username || conversation.username}
+                        src={msg.sender_avatar || conversation.avatar}
                         size="sm"
                       />
                     )}

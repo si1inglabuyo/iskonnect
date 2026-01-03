@@ -1,5 +1,5 @@
 // src/utils/formatTimeAgo.js
-import { format, formatDistanceToNowStrict } from 'date-fns';
+import { format } from 'date-fns';
 
 export function formatTimeAgo(dateString) {
   const date = new Date(dateString);
