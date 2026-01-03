@@ -24,7 +24,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative backdrop-blur-sm bg-black/100">
+    <div className="min-h-screen flex items-center justify-center relative backdrop-blur-sm bg-black/100 py-12 sm:py-100">
       
       <div
         className="absolute inset-0 bg-cover bg-center z-0"
@@ -34,7 +34,7 @@ export default function LoginPage() {
         }}
       />
       
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow z-10">
+      <div className="w-full max-w-md mx-4 sm:mx-0 p-8 space-y-6 bg-white rounded-lg shadow z-10">
         <h2 className="text-2xl font-bold text-center">Login</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
