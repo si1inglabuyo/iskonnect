@@ -1,23 +1,57 @@
 // src/components/Sidebar.jsx
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../lib/api';
 
 import Avatar from './Avatar';
 
 export default function Sidebar() {
      const { currentUser, logout } = useAuth();
      const navigate = useNavigate();
+     const [unreadCount, setUnreadCount] = useState(0);
+     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+     useEffect(() => {
+          if (!currentUser) {
+               setUnreadCount(0);
+               setUnreadMessagesCount(0);
+               return;
+          }
+
+          let cancelled = false;
+
+          const load = async () => {
+               try {
+                    // Fetch notification count (excludes messages)
+                    const notifRes = await api.get('/api/notifications');
+                    if (cancelled) return;
+                    const count = (notifRes.data || []).filter((n) => !n.is_read).length;
+                    setUnreadCount(count);
+
+                    // Fetch unread message count
+                    const msgRes = await api.get('/api/messages/unread-count');
+                    if (cancelled) return;
+                    setUnreadMessagesCount(msgRes.data.unread_count || 0);
+               } catch (err) {
+                    console.error('Failed to fetch counts');
+               }
+          };
+
+          load();
+          const interval = setInterval(load, 10000);
+
+          return () => {
+               cancelled = true;
+               clearInterval(interval);
+          };
+     }, [currentUser]);
 
      return (
           <div className="w-64 bg-[#800201] border-r h-screen fixed left-0 top-0 flex flex-col">
                {/* Logo */}
-               <div className="p-6 border-b">
-                    <h1
-                         className="text-3xl font-bold text-white tracking-wide"
-                         style={{ fontFamily: "'Great Vibes', cursive" }}
-                    >
-                         Iskonnect
-                    </h1>
+               <div className=" border-b flex items-center justify-center">
+                    <img src="/logo2.png" alt="Iskonnect" className="h-20 object-contain drop-shadow-lg" />
                </div>
 
                {/* Navigation - Top-Aligned */}
@@ -51,11 +85,16 @@ export default function Sidebar() {
                          onClick={() => navigate('/messages')}
                          className="flex items-center gap-4 w-full p-3 rounded-lg hover:bg-[#ee7c81]"
                     >
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffdf07" class="size-6">
-                              <path fill-rule="evenodd" d="M5.337 21.718a6.707 6.707 0 0 1-.533-.074.75.75 0 0 1-.44-1.223 3.73 3.73 0 0 0 .814-1.686c.023-.115-.022-.317-.254-.543C3.274 16.587 2.25 14.41 2.25 12c0-5.03 4.428-9 9.75-9s9.75 3.97 9.75 9c0 5.03-4.428 9-9.75 9-.833 0-1.643-.097-2.417-.279a6.721 6.721 0 0 1-4.246.997Z" clip-rule="evenodd" />
-                         </svg>
-
-
+                         <div className="relative">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffdf07" class="size-6">
+                                   <path fill-rule="evenodd" d="M5.337 21.718a6.707 6.707 0 0 1-.533-.074.75.75 0 0 1-.44-1.223 3.73 3.73 0 0 0 .814-1.686c.023-.115-.022-.317-.254-.543C3.274 16.587 2.25 14.41 2.25 12c0-5.03 4.428-9 9.75-9s9.75 3.97 9.75 9c0 5.03-4.428 9-9.75 9-.833 0-1.643-.097-2.417-.279a6.721 6.721 0 0 1-4.246.997Z" clip-rule="evenodd" />
+                              </svg>
+                              {unreadMessagesCount > 0 && (
+                                   <span className="absolute -top-1 -right-1 bg-yellow-400 text-[#800201] text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">
+                                        {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                                   </span>
+                              )}
+                         </div>
 
                          <span className="text-sm font-medium text-[#ffdf07]">Messages</span>
                     </button>
@@ -89,10 +128,16 @@ export default function Sidebar() {
                          onClick={() => navigate('/notifications')}
                          className="flex items-center gap-4 w-full p-3 rounded-lg hover:bg-[#ee7c81]"
                     >
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffdf07" class="size-6">
-                              <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clip-rule="evenodd" />
-                         </svg>
-
+                         <div className="relative">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffdf07" class="size-6">
+                                   <path fill-rule="evenodd" d="M5.25 9a6.75 6.75 0 0 1 13.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 0 1-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 1 1-7.48 0 24.585 24.585 0 0 1-4.831-1.244.75.75 0 0 1-.298-1.205A8.217 8.217 0 0 0 5.25 9.75V9Zm4.502 8.9a2.25 2.25 0 1 0 4.496 0 25.057 25.057 0 0 1-4.496 0Z" clip-rule="evenodd" />
+                              </svg>
+                              {unreadCount > 0 && (
+                                   <span className="absolute -top-1 -right-1 bg-yellow-400 text-[#800201] text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">
+                                        {unreadCount > 99 ? '99+' : unreadCount}
+                                   </span>
+                              )}
+                         </div>
 
                          <span className="text-sm font-medium text-[#ffdf07]">Notifications</span>
                     </button>

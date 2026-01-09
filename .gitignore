@@ -31,3 +31,9 @@ node_modules/
 /server/build
 /server/dist
 /server/.vscode
+
+# Project artifacts to ignore
+/server/migrations
+/SHARE_NOTIFICATION_SETUP.md
+/PRESENTATION_GUIDE.md
+/DOCUMENTATION.md

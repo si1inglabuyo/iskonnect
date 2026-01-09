@@ -6,7 +6,7 @@ const { QueryTypes } = require('sequelize');
 
 const router = express.Router();
 
-// GET /api/notifications — fetch user's notifications
+// GET /api/notifications — fetch user's notifications (excluding message type)
 router.get('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -28,6 +28,7 @@ router.get('/', authenticate, async (req, res) => {
       FROM notifications n
       LEFT JOIN profiles actor_profile ON n.actor_id = actor_profile.user_id
       WHERE n.user_id = :userId
+        AND n.action_type != 'message'
       ORDER BY n.created_at DESC
       LIMIT 50
       `,

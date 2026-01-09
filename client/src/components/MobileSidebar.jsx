@@ -1,12 +1,15 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom'; // ✅ Import useLocation
 import Avatar from './Avatar';
-import { useEffect, useRef } from 'react';
+import api from '../lib/api';
 
 export default function MobileSidebar({ isOpen, onClose }) {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation(); 
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   
   useEffect(() => {
     if (isOpen) {
@@ -30,6 +33,40 @@ export default function MobileSidebar({ isOpen, onClose }) {
       window.removeEventListener('click', handleClickOutside);
     };
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setUnreadCount(0);
+      setUnreadMessagesCount(0);
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        // Fetch notification count (excludes messages)
+        const notifRes = await api.get('/api/notifications');
+        if (cancelled) return;
+        const count = (notifRes.data || []).filter((n) => !n.is_read).length;
+        setUnreadCount(count);
+
+        // Fetch unread message count
+        const msgRes = await api.get('/api/messages/unread-count');
+        if (cancelled) return;
+        setUnreadMessagesCount(msgRes.data.unread_count || 0);
+      } catch (err) {
+        console.error('Failed to fetch counts');
+      }
+    };
+
+    load();
+    const interval = setInterval(load, 10000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [currentUser]);
 
   const navItems = [
     { name: 'Home', icon: 'M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25', path: '/feed' },
@@ -55,8 +92,8 @@ export default function MobileSidebar({ isOpen, onClose }) {
         }`}
       >
         {/* Logo */}
-        <div className="p-4 border-b">
-          <h1 className="text-xl font-bold text-gray-800">Iskonnect</h1>
+        <div className="border-b flex items-center justify-center">
+          <img src="/logo2.png" alt="Iskonnect" className="h-20 object-contain drop-shadow-lg" />
         </div>
 
         {/* Navigation */}
@@ -70,9 +107,21 @@ export default function MobileSidebar({ isOpen, onClose }) {
               }}
               className="flex items-center gap-4 w-full p-3 rounded-lg hover:bg-gray-100"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
-              </svg>
+              <div className="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                </svg>
+                {item.name === 'Notifications' && unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+                {item.name === 'Messages' && unreadMessagesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-5 min-w-[20px] px-1 flex items-center justify-center">
+                    {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
+                  </span>
+                )}
+              </div>
               <span className="text-sm font-medium">{item.name}</span>
             </button>
           ))}

@@ -6,6 +6,31 @@ const { QueryTypes } = require('sequelize');
 const router = express.Router();
 
 
+// GET /api/messages/unread-count - Get total unread message count
+router.get('/unread-count', authenticate, async (req, res) => {
+     try {
+          const userId = req.user.userId;
+
+          const result = await sequelize.query(
+               `SELECT COUNT(*) as unread_count
+               FROM messages m
+               JOIN participants p ON m.conversation_id = p.conversation_id
+               WHERE p.user_id = :userId
+                    AND m.sender_id != :userId
+                    AND m.is_read = false`,
+               {
+                    replacements: { userId },
+                    type: QueryTypes.SELECT
+               }
+          );
+
+          res.json({ unread_count: parseInt(result[0].unread_count) || 0 });
+     } catch (err) {
+          console.error('Fetch unread count error:', err);
+          res.status(500).json({ error: 'Failed to fetch unread count' });
+     }
+});
+
 // GET /api/messages - List all convo
 router.get('/', authenticate, async (req, res) => {
      try {
@@ -31,7 +56,7 @@ router.get('/', authenticate, async (req, res) => {
                FROM conversations c
                JOIN participants p1
                     ON c.id = p1.conversation_id AND p1.user_id = :userId
-               LEFT JOIN messages m 
+               LEFT JOIN messages m
                     ON m.id = (
                          SELECT id FROM messages
                          WHERE conversation_id = c.id
@@ -42,6 +67,7 @@ router.get('/', authenticate, async (req, res) => {
                     AND unread.sender_id != :userId
                     AND unread.is_read = false
                WHERE p1.user_id = :userId
+                    AND EXISTS (SELECT 1 FROM messages WHERE conversation_id = c.id)
                GROUP BY c.id, c.created_at, c.is_group, c.group_name, c.group_avatar_url, m.content, m.created_at, m.sender_id
                ORDER BY m.created_at DESC NULLS LAST, c.created_at DESC`,
                     {
@@ -71,14 +97,15 @@ router.post('/create', authenticate, async (req, res) => {
      }
 
      try {
-          // Check if conversation exists already
+          // Check if 1-on-1 conversation exists already (exclude group chats)
           const existingConv = await sequelize.query(
                `SELECT c.id
                FROM conversations c
                JOIN participants p1
                     ON c.id = p1.conversation_id AND p1.user_id = :sender_id
                JOIN participants p2
-                    ON c.id = p2.conversation_id AND p2.user_id = :recipient_id`,
+                    ON c.id = p2.conversation_id AND p2.user_id = :recipient_id
+               WHERE c.is_group = false`,
                {
                     replacements: { sender_id, recipient_id },
                     type: QueryTypes.SELECT

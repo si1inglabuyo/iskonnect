@@ -67,7 +67,7 @@ export default function PublicProfilePage() {
                const res = await api.get(`/api/follows/me/following/${id}`);
                setIsFollowing(res.data.isFollowing);
           } catch (err) {
-               console.error('Failed tp chech follow status');
+               console.error('Failed to check follow status');
           }
      };
 

@@ -10,7 +10,7 @@ const actionMessages = {
      follow: 'followed you',
      like: 'liked your post',
      comment: 'commented on your post',
-     message: 'sent you a message'
+     share_post: 'shared your post'
 };
 
 export default function NotificationsPage() {
@@ -48,9 +48,7 @@ export default function NotificationsPage() {
      api.patch(`/api/notifications/${notification.id}`);
 
      // Navigate based on type
-     if (notification.action_type === 'message') {
-          navigate(`/messages/${notification.conversation_id}`);
-          } else if (notification.post_id) {
+     if (notification.post_id) {
                // Fetch the full post and open in modal
                (async () => {
                     try {

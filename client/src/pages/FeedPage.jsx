@@ -30,7 +30,6 @@ export default function FeedPage() {
   const navigate = useNavigate();
 
   // Update time every 30s
-
   useEffect(() => {
     const interval = setInterval(() => {
       setTick(t => t + 1);
@@ -84,8 +83,6 @@ export default function FeedPage() {
     fetchSuggested();
   }, [currentUser]);
 
-  
-
   const toggleLike = async (post) => {
     const originalPosts = [...posts];
     const updated = posts.map((p) => {
@@ -132,7 +129,6 @@ export default function FeedPage() {
     }
   };
 
-  
   const handleNewComment = (postId) => {
     // Refetch comments to include new one
     api.get(`/api/comments/${postId}`)
@@ -173,7 +169,6 @@ export default function FeedPage() {
 
     const wasFollowing = !!firstPostByUser.user_is_following;
 
-    
     setPosts((prev) =>
       prev.map((post) =>
         post.user_id === userId ? { ...post, user_is_following: !wasFollowing } : post
@@ -197,7 +192,7 @@ export default function FeedPage() {
         window.dispatchEvent(new Event('followStatusChanged'));
       }
     } catch (err) {
-      // Revert optimistic change on error
+      // Revert change on error
       setPosts((prev) =>
         prev.map((post) =>
           post.user_id === userId ? { ...post, user_is_following: wasFollowing } : post
@@ -220,7 +215,6 @@ export default function FeedPage() {
 
     setPosts(updated);
 
-    // Optimistically notify other parts of the app immediately
     const pid = post?.id || post.id;
     const newSaved = !wasSaved;
     window.dispatchEvent(new CustomEvent('saveToggled', { detail: { postId: pid, saved: newSaved } }));
@@ -604,6 +598,13 @@ export default function FeedPage() {
               </div>
             </div>
           ))
+        )}
+        {posts.length > 0 && (
+          <div className="text-center py-8 mt-4">
+            <p className="text-gray-500 text-sm">
+              You're all caught up! Follow more users to see their content.
+            </p>
+          </div>
         )}
         </div>
       </div>

@@ -92,6 +92,7 @@ router.get('/:id', async (req, res) => {
           }
 
           // Fallback: if stored proc didn't return anything, build profile from tables
+          
           if (!p) {
                const fallback = await sequelize.query(
                     `SELECT u.id, u.email, p.username, p.full_name, p.bio, p.avatar_url, p.website,

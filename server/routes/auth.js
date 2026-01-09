@@ -1,11 +1,9 @@
-// server/routes/auth.js
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
 const authenticate = require('../middleware/auth');
 const sequelize = require('../config/database');
-const { QueryTypes } = require('sequelize');
 
 
 const router = express.Router();
@@ -53,12 +51,9 @@ router.post('/register', async (req, res) => {
     }
 
     // Check username
-    const existingProfile = await sequelize.query(
-      `SELECT 1 FROM profiles WHERE username = :username`,
-      { replacements: { username }, type: QueryTypes.SELECT }
-    );
+    const existingProfile = await Profile.findOne({ where: { username } });
 
-    if (existingProfile.length > 0) {
+    if (existingProfile) {
       return res.status(400).json({ error: 'Username already taken' });
     }
 
@@ -69,13 +64,11 @@ router.post('/register', async (req, res) => {
     });
 
     // Create profile with username + fullname
-    await sequelize.query(
-      `INSERT INTO profiles (user_id, username, full_name) VALUES (:userId, :username, :full_name)`,
-      {
-        replacements: { userId: user.id, username, full_name: full_name.trim() },
-        type: QueryTypes.INSERT
-      }
-    );
+    await Profile.create({
+      user_id: user.id,
+      username,
+      full_name: full_name.trim()
+    });
 
     // Respond without password
     res.status(201).json({
