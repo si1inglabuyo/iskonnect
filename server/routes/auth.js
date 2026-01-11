@@ -39,6 +39,12 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email, username, full name, and password are required' });
     }
 
+    // Validate email domain (must end with @iskolarngbayan.pup.edu.ph)
+    const requiredDomain = '@iskolarngbayan.pup.edu.ph';
+    if (!email.toLowerCase().endsWith(requiredDomain)) {
+      return res.status(400).json({ error: `Email must end with ${requiredDomain}` });
+    }
+
     if (full_name.trim().length < 2) {
       return res.status(400).json({ error: 'Full name must be at least 2 characters' });
     }

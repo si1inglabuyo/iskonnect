@@ -326,15 +326,19 @@ router.put('/:id', authenticate, async (req, res) => {
           const userId = req.user.userId;
           const { content, image_url } = req.body;
 
-          const post = await Post.findByPk(id);
-          if (!post) return res.status(404).json({ error: 'Post not found' });
-          if (post.user_id !== userId) return res.status(403).json({ error: 'Not authorized to edit this post' });
-
-          // Update allowed fields
-          post.content = typeof content === 'undefined' ? post.content : (content || null);
-          if (typeof image_url !== 'undefined') post.image_url = image_url || null;
-
-          await post.save();
+          // stored procedure to update post
+          await sequelize.query(
+               'CALL update_post(:postId, :userId, :content, :imageUrl)',
+               {
+                    replacements: {
+                         postId: id,
+                         userId: userId,
+                         content: content !== undefined ? content : null,
+                         imageUrl: image_url !== undefined ? image_url : null
+                    },
+                    type: QueryTypes.RAW
+               }
+          );
 
           // Re-fetch full post with includes to return same shape as GET
           const updated = await Post.findByPk(id, {
@@ -367,7 +371,7 @@ router.put('/:id', authenticate, async (req, res) => {
           res.json({ ...updated.toJSON() });
      } catch (err) {
           console.error('Edit post error:', err);
-          res.status(500).json({ error: 'Server error' });
+          res.status(500).json({ error: err.message || 'Server error' });
      }
 });
 

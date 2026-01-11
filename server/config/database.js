@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 const dns = require('dns');
 dns.setDefaultResultOrder('ipv4first'); 
-
+/* 
 const sequelize = new Sequelize(
      process.env.DB_NAME || 'postgres',
      process.env.DB_USER || 'postgres',
@@ -19,6 +19,18 @@ const sequelize = new Sequelize(
           logging: false
      }
 );
+*/
+
+const { Sequelize } = require('sequelize');
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  logging: false,
+  dialectOptions: {
+    ssl: { require: true, rejectUnauthorized: false },
+    family: 4, 
+  },
+});
 
 module.exports = sequelize;
 
