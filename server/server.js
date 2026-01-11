@@ -16,12 +16,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 
+/* 
 //app.use(cors());
 //for testing
  app.use(cors({
   origin: "http://192.168.0.35:3000",
   credentials: true
 })); 
+
+*/
+const allowedOrigins = [
+  'https://iskonnect-c11v-kc3l78h8t-revis-projects-66c84ce6.vercel.app', // your Vercel URL
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // Parse JSON bodies
 app.use(express.json());
