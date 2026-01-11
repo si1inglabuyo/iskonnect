@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 5000;
 
 */
 const allowedOrigins = [
-  'https://iskonnect-c11v-kc3l78h8t-revis-projects-66c84ce6.vercel.app', // your Vercel URL
+  'https://iskonnect-c11v.vercel.app', // your Vercel URL
   'http://localhost:3000'
 ];
 

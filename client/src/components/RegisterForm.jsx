@@ -10,12 +10,29 @@ export default function RegisterForm({ onSwitchToLogin }) {
      const [full_name, setFullName] = useState('');
      const [password, setPassword] = useState('');
      const [loading, setLoading] = useState(false);
+     const [emailError, setEmailError] = useState('');
      const navigate = useNavigate();
+
+     // Validate email domain
+     const validateEmail = (emailValue) => {
+          const requiredDomain = '@iskolarngbayan.pup.edu.ph';
+          if (!emailValue.endsWith(requiredDomain)) {
+               setEmailError(`Email must end with ${requiredDomain}`);
+               return false;
+          }
+          setEmailError('');
+          return true;
+     };
 
      const handleSubmit = async (e) => {
           e.preventDefault();
           if(!email || !username || !full_name || !password) {
-               alert('All fieds are required');
+               alert('All fields are required');
+               return;
+          }
+
+          // Validate email domain before submit
+          if (!validateEmail(email)) {
                return;
           }
           
@@ -48,7 +65,7 @@ export default function RegisterForm({ onSwitchToLogin }) {
           <div className='w-full max-w-md space-y-4 z-10'>
                <div className='text-center'>
                     <h1 className='text-2xl font-bold'>Create Account</h1>
-                    <p className='text-gray-500 mt-1 '>Join SocialFeed Today</p>
+                    <p className='text-gray-500 mt-1 '>Join ISKOnnect Today</p>
                </div>
 
                <form onSubmit={handleSubmit} className='space-y-4'>
@@ -74,9 +91,13 @@ export default function RegisterForm({ onSwitchToLogin }) {
                          type="email"
                          placeholder="Email"
                          value={email}
-                         onChange={(e) => setEmail(e.target.value)}
+                         onChange={(e) => {
+                              setEmail(e.target.value);
+                              validateEmail(e.target.value);
+                         }}
                          required
                     />
+                    {emailError && <p className='text-red-500 text-sm'>{emailError}</p>}
 
                     <Input
                          type="password"

@@ -12,7 +12,6 @@ import PostModal from '../components/PostModal';
 import ShareComposer from '../components/ShareComposer';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-
 // ── Main Feed Page ──
 export default function FeedPage() {
   const [posts, setPosts] = useState([]);
